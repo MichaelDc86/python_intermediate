@@ -3,7 +3,7 @@
 #
 # ping('8.8.8.8', verbose=True)
 # url_1 = 'https://www.youtube.com/'
-# youtube = requests.get(url_1).text
+# youtube = requests.get(url_1).content
 
 word_1 = 'разработка'
 word_2 = 'сокет'
@@ -30,7 +30,7 @@ strl_word_1 = bl_word_1.decode('latin-1')
 
 print(bl_word_1)
 print(strl_word_1)
-# print(youtube)
+# print(youtube.decode())
 
 print(f'{b_word_1}; {type(b_word_1)}\n'
       f'{b_word_2}; {type(b_word_2)}\n'
