@@ -32,6 +32,10 @@ port = default_config.get('port')
 
 print(f'Server was started on {host}:{port}')
 
+data = input('Stop server?: y/n ')
+if data == 'y':
+    sock.close()
+
 while True:
     client, address = sock.accept()
     print(f'Client was connected with {address[0]}:{address[1]}')
@@ -39,3 +43,6 @@ while True:
     print(f'Client sent massage: {b_request.decode()}')
     client.send(b_request)
     client.close()
+    data = input('Stop server?: y/n ')
+    if data == 'y':
+        break
