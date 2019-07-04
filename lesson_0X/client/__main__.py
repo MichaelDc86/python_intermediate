@@ -1,6 +1,8 @@
 import yaml
 from socket import socket
 from argparse import ArgumentParser
+import json
+from datetime import datetime
 
 parser = ArgumentParser()
 
@@ -22,27 +24,24 @@ if args.config:
         default_config.update(config)
 
 sock = socket()
-sock.bind(
+sock.connect(
     (default_config.get('host'), default_config.get('port'),)
 )
-sock.listen(5)
 
-host = default_config.get('host')
-port = default_config.get('port')
+print(f'Client was started')
 
-print(f'Server was started on {host}:{port}')
+action = input('Specify action: ')
+data = input('Enter data:  ')
 
-data = input('Stop server?: y/n ')
-if data == 'y':
-    sock.close()
+request = {
+    'data': data,
+    'time': datetime.now().timestamp(),
+    'action': action,
+}
 
-while True:
-    client, address = sock.accept()
-    print(f'Client was connected with {address[0]}:{address[1]}')
-    b_request = client.recv(1024)
-    print(f'Client sent massage: {b_request.decode()}')
-    client.send(b_request)
-    client.close()
-    data = input('Stop server?: y/n ')
-    if data == 'y':
-        break
+s_request = json.dumps(request)
+
+sock.send(s_request.encode())
+print(f'Client sent data: {data}')
+b_response = sock.recv(1024)
+print(b_response.decode())
