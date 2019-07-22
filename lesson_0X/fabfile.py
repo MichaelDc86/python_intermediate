@@ -11,6 +11,7 @@ def client():
 
 def test():
     local('pytest --cov-report term-missing --cov server')
+    # local('pytest --cov-report term-missing --cov client')
 
 
 def notebook():
