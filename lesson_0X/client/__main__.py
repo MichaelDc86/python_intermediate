@@ -4,6 +4,13 @@ from argparse import ArgumentParser
 import json
 from datetime import datetime
 
+import sys
+import os
+sys.path.append(os.getcwd() + '\\log')
+from client_log_config import create_logger
+
+logger = create_logger()
+
 parser = ArgumentParser()
 
 parser.add_argument(
@@ -28,7 +35,8 @@ sock.connect(
     (default_config.get('host'), default_config.get('port'),)
 )
 
-print(f'Client was started')
+logger.info(f'Client was started')
+# print(f'Client was started')
 
 action = input('Specify action: ')
 data = input('Enter data:  ')
@@ -42,6 +50,8 @@ request = {
 s_request = json.dumps(request)
 
 sock.send(s_request.encode())
-print(f'Client sent data: {data}')
+logger.debug(f'Client sent data: {data}')
+# print(f'Client sent data: {data}')
 b_response = sock.recv(1024)
-print(b_response.decode())
+logger.info(f'RESPONSE: {b_response.decode()}')
+# print(b_response.decode())
