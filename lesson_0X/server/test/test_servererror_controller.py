@@ -33,7 +33,10 @@ def request_fixture(action_fixture, time_fixture, data_fixture):
 
 
 def test_servererror_controller(request_fixture, error_fixture):
-    try:
+    # try:
+    #     servererror_controller(request_fixture)
+    # except Exception as err:
+    #     return err == error_fixture
+
+    with pytest.raises(Exception, match='Server Error'):
         servererror_controller(request_fixture)
-    except Exception as err:
-        return err == error_fixture
