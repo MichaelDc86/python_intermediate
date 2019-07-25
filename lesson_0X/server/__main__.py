@@ -5,6 +5,14 @@ from argparse import ArgumentParser
 from protocol import validate_request, make_response
 from resolvers import resolve
 
+import sys
+import os
+sys.path.append(os.getcwd() + '\\log')
+from serever_log_config import create_logger
+
+logger = create_logger()
+
+
 parser = ArgumentParser()
 
 parser.add_argument(
@@ -33,7 +41,8 @@ sock.listen(5)
 host = default_config.get('host')
 port = default_config.get('port')
 
-print(f'Server was started on {host}:{port}')
+logger.info(f'Server was started on {host}:{port}')
+# print(f'Server was started on {host}:{port}')
 
 data = input('Stop server?: y/n ')
 if data == 'y':
@@ -41,7 +50,8 @@ if data == 'y':
 
 while True:
     client, address = sock.accept()
-    print(f'Client was connected with {address[0]}:{address[1]}')
+    logger.info(f'Client was connected with {address[0]}:{address[1]}')
+    # print(f'Client was connected with {address[0]}:{address[1]}')
 
     b_request = client.recv(default_config.get('buffersize'))
     request = json.loads(b_request.decode())
@@ -53,20 +63,24 @@ while True:
         if controller:
 
             try:
-                print(f'Controller {controller} resolved with request: {request}')
+                logger.debug(f'Controller {controller} resolved with request: {request}')
+                # print(f'Controller {controller} resolved with request: {request}')
                 # response = make_response(request, 200, request.get('data'))
                 response = controller(request)
 
             except Exception as err:
-                print(f'Controller {controller} error: {err}')
+                logger.critical(f'Controller {controller} error: {err}')
+                # print(f'Controller {controller} error: {err}')
                 response = make_response(request, 500, 'Internal Server  Error!')
         # ------------------------------------------------
         else:
-            print(f'Controller {controller} not found!')
+            logger.error(f'Controller {controller} not found!')
+            # print(f'Controller {controller} not found!')
             response = make_response(request, 404, f'Action with name {action} is not supported!')
 
     else:
-        print(f'Wrong request!')
+        logger.error(f'Wrong request!')
+        # print(f'Wrong request!')
         response = make_response(request, 400, 'Wrong request format!')
 
     client.send(json.dumps(response).encode())

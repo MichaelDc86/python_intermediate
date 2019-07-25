@@ -1,0 +1,7 @@
+jupyter
+chardet
+requests
+pytest
+pytest-cov
+fabric3
+pyyaml
