@@ -1,0 +1,3 @@
+buffersize: 512
+host: localhost
+port: 80
