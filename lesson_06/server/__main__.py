@@ -47,6 +47,7 @@ logger.info(f'Server was started on {host}:{port}')
 data = input('Stop server?: y/n ')
 if data == 'y':
     sock.close()
+    logger.info('Server shutdown')
 
 while True:
     client, address = sock.accept()
@@ -88,4 +89,5 @@ while True:
 
     data = input('Stop server?: y/n ')
     if data == 'y':
+        logger.info('Server shutdown')
         break

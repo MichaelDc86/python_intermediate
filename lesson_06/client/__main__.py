@@ -3,6 +3,7 @@ from socket import socket
 from argparse import ArgumentParser
 import json
 from datetime import datetime
+import hashlib
 
 import sys
 import os
@@ -38,6 +39,11 @@ sock.connect(
 logger.info(f'Client was started')
 # print(f'Client was started')
 
+hash_obj = hashlib.sha256()
+hash_obj.update(
+    str(datetime.now().timestamp()).encode()
+)
+
 action = input('Specify action: ')
 data = input('Enter data:  ')
 
@@ -45,6 +51,7 @@ request = {
     'data': data,
     'time': datetime.now().timestamp(),
     'action': action,
+    'token': hash_obj.hexdigest(),
 }
 
 s_request = json.dumps(request)

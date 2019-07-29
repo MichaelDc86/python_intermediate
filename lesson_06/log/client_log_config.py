@@ -10,6 +10,8 @@ def create_logger():
     handler = logging.FileHandler('log/client.log')
     handler.setFormatter(formatter)
     handler.setLevel(logging.DEBUG)
+    handler_console = logging.StreamHandler()
 
     logger.addHandler(handler)
+    logger.addHandler(handler_console)
     return logger
