@@ -5,8 +5,8 @@ def server():
     local('python server')
 
 
-def client():
-    local('python client')
+def client(mode):
+    local(f'python client --mode {mode}')
 
 
 def test():
@@ -19,4 +19,4 @@ def notebook():
 
 
 def kill():
-    local('lsof -t -i tcp:8000 | xargs kill')
+    local('lsof -t -i tcp:8000 | xargs kill -V')
