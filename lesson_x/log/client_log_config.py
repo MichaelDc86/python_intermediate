@@ -15,3 +15,8 @@ def create_logger():
     logger.addHandler(handler)
     logger.addHandler(handler_console)
     return logger
+
+
+def get_logger():
+    logger_in = create_logger()
+    return logger_in
