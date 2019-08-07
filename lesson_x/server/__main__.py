@@ -40,8 +40,8 @@ try:
     sock.bind(
         (default_config.get('host'), default_config.get('port'),)
     )
-    sock.setblocking(False)
-    # sock.settimeout(0)  # for windows
+    # sock.setblocking(False)
+    sock.settimeout(0)  # for windows
     sock.listen(5)
 
     host = default_config.get('host')
@@ -49,10 +49,10 @@ try:
 
     logger.info(f'Server was started on {host}:{port}')
 
-    data = input('Stop server?: y/n ')
-    if data == 'y':
-        sock.close()
-        logger.info('Server shutdown')
+    # data = input('Stop server?: y/n ')
+    # if data == 'y':
+    #     sock.close()
+    #     logger.info('Server shutdown')
 
     connections = []
     requests = []
@@ -65,28 +65,29 @@ try:
         except BlockingIOError:
             pass
 
-        rlist, wlist, xlist = select.select(
-            connections, connections, connections, 0
-        )
+        if connections:
+            rlist, wlist, xlist = select.select(
+                connections, connections, connections, 0
+            )
 
-        for r_client in rlist:
-            print(rlist)
-            print(wlist)
-            print(xlist)
-            b_request = r_client.recv(default_config.get('buffersize'))
-            requests.append(b_request)
+            for r_client in rlist:
+                print(rlist)
+                print(wlist)
+                print(xlist)
+                b_request = r_client.recv(default_config.get('buffersize'))
+                requests.append(b_request)
 
-        if requests:
-            print(requests)
-            b_request = requests.pop()
-            b_response = handle_default_request(b_request, logger)
+            if requests:
+                print(requests)
+                b_request = requests.pop()
+                b_response = handle_default_request(b_request, logger)
 
-            for w_client in wlist:
-                w_client.send(b_response)
+                for w_client in wlist:
+                    w_client.send(b_response)
 
-        # data = input('Stop server?: y/n ')
-        # if data == 'y':
-        #     logger.info('Server shutdown')
-        #     break
+            # data = input('Stop server?: y/n ')
+            # if data == 'y':
+            #     logger.info('Server shutdown')
+            #     break
 except KeyboardInterrupt:
     logger.info('Server shutdown')

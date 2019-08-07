@@ -50,6 +50,10 @@ def write(sock_):
     action = input('Specify action: ')
     data = input('Enter data:  ')
 
+    # if action == 'stop':
+    #     sock_.close()
+    #     print(f'Client shutdown.')
+
     request = {
         'data': data,
         'time': datetime.now().timestamp(),
