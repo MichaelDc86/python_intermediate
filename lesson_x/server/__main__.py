@@ -40,7 +40,7 @@ try:
     sock.bind(
         (default_config.get('host'), default_config.get('port'),)
     )
-    # sock.setblocking(False)
+    # sock.setblocking(False)  # for nix
     sock.settimeout(0)  # for windows
     sock.listen(5)
 
@@ -74,8 +74,16 @@ try:
                 print(rlist)
                 print(wlist)
                 print(xlist)
-                b_request = r_client.recv(default_config.get('buffersize'))
-                requests.append(b_request)
+                try:
+                    b_request = r_client.recv(default_config.get('buffersize'))
+                    requests.append(b_request)
+                except (ConnectionAbortedError, ConnectionResetError) as err:
+                    try:
+                        connections.remove(client)
+                        print(connections)
+                    except ValueError:
+                        connections = []
+                        print(connections)
 
             if requests:
                 print(requests)
