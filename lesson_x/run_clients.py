@@ -1,8 +1,9 @@
 import subprocess
 import signal
 import psutil
+import os
 
-CLIENTS_QUANTITY = 2
+CLIENTS_QUANTITY = 7
 
 
 def run_client(mode='r'):
@@ -12,7 +13,6 @@ def run_client(mode='r'):
     build = subprocess.Popen(
         command,
         shell=True,
-        # shell=False,
         # creationflags=CREATE_NEW_CONSOLE,
         creationflags=subprocess.CREATE_NEW_PROCESS_GROUP,
         stdin=subprocess.PIPE,
@@ -28,27 +28,25 @@ def run_client(mode='r'):
 def main():
     clients_list = []
     for i in range(CLIENTS_QUANTITY):
-        clients_list.append(run_client())
+        r_client = run_client()
+        clients_list.append(r_client)
 
     writer = run_client('w')
-    clients_list.append(writer)
-    out = writer.communicate('echo\nHi!!!\n'.encode())[0]
-    # out = writer.communicate('server_time\nHallo!!!\n'.encode())[0]
-    # out = writer.stdin.write('echo\ndte\n'.encode())
+    # clients_list.append(writer)
+    # out = writer.communicate('echo\nHi!!!\n'.encode())[1]
+    writer.stdin.write('server_time\nOPA!!!\n'.encode())
+    writer.stdin.write('echo\nHi!!!\n'.encode())
+    writer.send_signal(signal.CTRL_BREAK_EVENT)
+    # outs = writer.communicate('server_time\nOPA!!!\n'.encode())[1]
     # writer.send_signal(signal.CTRL_C_EVENT)
     # writer.send_signal(signal.CTRL_BREAK_EVENT)
 
-    print(out)
+    # print(out)
+    print('---------------------------------------------------------------------')
+    # print(outs)
 
     for stream in clients_list:
-        # outs, errs = stream.communicate()
-        # stream.kill()
-        # subprocess.Popen("TASKKILL /F /PID {pid} /T".format(pid=stream.pid))
-        # outs = stream.communicate('\n'.encode())[0]
-        # print(outs)
-        print(stream.terminate())
-        # stream.send_signal(signal.CTRL_C_EVENT)
-        # outs = stream.communicate()[0]
+        stream.send_signal(signal.CTRL_BREAK_EVENT)
 
 
 main()

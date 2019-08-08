@@ -50,10 +50,6 @@ def write(sock_):
     action = input('Specify action: ')
     data = input('Enter data:  ')
 
-    # if action == 'stop':
-    #     sock_.close()
-    #     print(f'Client shutdown.')
-
     request = {
         'data': data,
         'time': datetime.now().timestamp(),
@@ -77,7 +73,7 @@ sock = socket()
 sock.connect(
     (default_config.get('host'), default_config.get('port'),)
 )
-logger.info(f'Client was started')
+logger.info(f'Client {args.mode} was started')
 
 try:
     while True:
@@ -85,6 +81,7 @@ try:
             write(sock)
         elif args.mode == 'r':
             read(sock)
+
 except KeyboardInterrupt:
     sock.close()
     print(f'Client shutdown.')

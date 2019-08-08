@@ -56,36 +56,48 @@ try:
 
     connections = []
     requests = []
+    disconnect_client = None
 
     while True:
         try:
             client, address = sock.accept()
+            print(client)
             connections.append(client)
             logger.info(f'Client was connected with {address[0]}:{address[1]} | Connections: {connections}')
         except BlockingIOError:
             pass
 
+        if disconnect_client:
+            print('------------------------------------------------')
+            print(f'disconnect_client {disconnect_client}')
+            print('------------------------------------------------')
+            print(f'Connections BEFORE DELETE {connections}')
+            print('------------------------------------------------')
+            print(f'LENGHT OF CONNECTIONS BEFORE {len(connections)}')
+            print('------------------------------------------------')
+            connections.remove(disconnect_client)
+            print(f'Connections After DELETE {connections}')
+            print(f'LENGHT OF CONNECTIONS AFTER {len(connections)}')
+            print('------------------------------------------------')
+            disconnect_client = None
+
         if connections:
             rlist, wlist, xlist = select.select(
                 connections, connections, connections, 0
             )
-
+            # print(connections)
             for r_client in rlist:
                 print(rlist)
                 print(wlist)
-                print(xlist)
+                # print(xlist)
                 try:
                     b_request = r_client.recv(default_config.get('buffersize'))
                     requests.append(b_request)
                 except (ConnectionAbortedError, ConnectionResetError) as err:
-                    try:
-                        connections.remove(client)
-                        print(connections)
-                    except ValueError:
-                        connections = []
-                        print(connections)
+                    disconnect_client = r_client
 
             if requests:
+
                 print(requests)
                 b_request = requests.pop()
                 b_response = handle_default_request(b_request, logger)
