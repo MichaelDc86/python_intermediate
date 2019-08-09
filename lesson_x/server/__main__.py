@@ -19,7 +19,7 @@ except ModuleNotFoundError:
 def read(sock_, connections_, requests_, buffersize):
     try:
         bytes_request = r_client.recv(buffersize)
-    except (ConnectionResetError,):
+    except (ConnectionAbortedError, ConnectionResetError):
         # except Exception:
         try:
             connections_.remove(sock_)
@@ -84,6 +84,7 @@ try:
             pass
 
         if connections:
+            print(connections)
             rlist, wlist, xlist = select.select(
                 connections, connections, connections, 0
             )
