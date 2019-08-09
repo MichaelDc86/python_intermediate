@@ -5,6 +5,8 @@ from argparse import ArgumentParser
 import json
 from datetime import datetime
 import hashlib
+import threading
+import time
 
 import sys
 import os
@@ -16,15 +18,20 @@ except ModuleNotFoundError:
     sys.path.append(os.getcwd() + '/log')
     from client_log_config import get_logger
 
+
+def read(sock_, buffersize_):
+    while True:
+        compressed_response = sock_.recv(buffersize_)
+        b_response = zlib.decompress(compressed_response)
+        logger.info(f'RESPONSE: {b_response.decode()}')
+
+
 logger = get_logger()
 
 parser = ArgumentParser()
 
 parser.add_argument(
     '-c', '--config', type=str, required=False, help='Sets config file path'
-)
-parser.add_argument(
-    '-m', '--mode', type=str, required=False, default='r', help='Sets config file path'
 )
 
 args = parser.parse_args()
@@ -63,24 +70,25 @@ def write(sock_):
     logger.debug(f'Client sent data: {data}')
 
 
-def read(sock_):
-    compressed_response = sock_.recv(1024)
-    b_response = zlib.decompress(compressed_response)
-    logger.info(f'RESPONSE: {b_response.decode()}')
-
-
 sock = socket()
 sock.connect(
     (default_config.get('host'), default_config.get('port'),)
 )
-logger.info(f'Client {args.mode} was started')
+logger.info(f'Client was started')
 
 try:
+    read_thread = threading.Thread(
+        target=read,
+        args=(
+            sock,
+            default_config.get('buffersize')
+        )
+    )
+    read_thread.start()
     while True:
-        if args.mode == 'w':
-            write(sock)
-        elif args.mode == 'r':
-            read(sock)
+        # time.sleep(1)
+        write(sock)
+
 
 except KeyboardInterrupt:
     sock.close()
