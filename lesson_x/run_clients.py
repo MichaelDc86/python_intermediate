@@ -1,5 +1,6 @@
 import subprocess
 import signal
+import time
 import psutil
 import os
 
@@ -31,17 +32,18 @@ def main():
         r_client = run_client()
         clients_list.append(r_client)
 
+    time.sleep(1)
     writer = run_client('w')
     # clients_list.append(writer)
-    # out = writer.communicate('echo\nHi!!!\n'.encode())[1]
-    writer.stdin.write('server_time\nOPA!!!\n'.encode())
-    writer.stdin.write('echo\nHi!!!\n'.encode())
-    writer.send_signal(signal.CTRL_BREAK_EVENT)
+    out = writer.communicate('echo\nHi!!!\n'.encode())[1]
+    # writer.stdin.write('server_time\nOPA!!!\n'.encode())
+    # writer.stdin.write('echo\nHi!!!\n'.encode())
+    # writer.send_signal(signal.CTRL_BREAK_EVENT)
     # outs = writer.communicate('server_time\nOPA!!!\n'.encode())[1]
     # writer.send_signal(signal.CTRL_C_EVENT)
     # writer.send_signal(signal.CTRL_BREAK_EVENT)
 
-    # print(out)
+    print(out)
     print('---------------------------------------------------------------------')
     # print(outs)
 
