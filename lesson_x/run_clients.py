@@ -1,5 +1,6 @@
 import subprocess
 import signal
+import sys
 import time
 
 CLIENTS_QUANTITY = 3
@@ -11,7 +12,7 @@ def run_client():
     build = subprocess.Popen(
         command,
         shell=True,
-        creationflags=subprocess.CREATE_NEW_PROCESS_GROUP,
+        # creationflags=subprocess.CREATE_NEW_PROCESS_GROUP,
         stdin=subprocess.PIPE,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE
@@ -36,7 +37,10 @@ def main():
         # time.sleep(1)
 
     for stream in clients_list:
-        stream.send_signal(signal.CTRL_BREAK_EVENT)
+        if sys.platform == 'win32':
+            stream.send_signal(signal.CTRL_BREAK_EVENT)
+        elif sys.platform == 'linux':
+            stream.send_signal(signal.SIGKILL)
 
 
 main()

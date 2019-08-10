@@ -6,4 +6,3 @@ pytest-cov
 fabric3
 pyyaml
 tabulate
-psutil

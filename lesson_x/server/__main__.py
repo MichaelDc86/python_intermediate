@@ -63,8 +63,10 @@ try:
     sock.bind(
         (default_config.get('host'), default_config.get('port'),)
     )
-    # sock.setblocking(False)  # for nix
-    sock.settimeout(0)  # for windows
+    if sys.platform == 'linux':
+        sock.setblocking(False)  # for nix
+    elif sys.platform == 'win32':
+        sock.settimeout(0)  # for windows
     sock.listen(5)
 
     host = default_config.get('host')
@@ -84,7 +86,7 @@ try:
             pass
 
         if connections:
-            print(connections)
+            # print(connections)
             rlist, wlist, xlist = select.select(
                 connections, connections, connections, 0
             )
