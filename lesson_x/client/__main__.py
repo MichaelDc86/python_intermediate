@@ -20,32 +20,8 @@ except ModuleNotFoundError:
 
 class TypedProperty:
 
-    default_config = {
-        'host': 'localhost',
-        'port': 8000,
-        'buffersize': 1024
-    }
-
     def __init__(self, name):
         self.name = name
-
-    def __get__(self, instance, cls):
-        return self.default_config.get(self.name)
-
-    def __set__(self, instance, value):
-        setattr(instance, self.name, value)
-
-    def __delete__(self, instance):
-        raise AttributeError("Невозможно удалить атрибут")
-
-
-class ConfigClient:
-
-    host = TypedProperty('host')
-    port = TypedProperty('port')
-    buffersize = TypedProperty('buffersize')
-
-    def __init__(self):
         self.args = None
 
     default_config = {
@@ -65,6 +41,22 @@ class ConfigClient:
             with open(self.args.config) as file:
                 config_ = yaml.load(file, Loader=yaml.Loader)
                 self.default_config.update(config_)
+
+    def __get__(self, instance, cls):
+        return self.default_config.get(self.name)
+
+    def __set__(self, instance, value):
+        setattr(instance, self.name, value)
+
+    def __delete__(self, instance):
+        raise AttributeError("Невозможно удалить атрибут")
+
+
+class ConfigClient:
+
+    host = TypedProperty('host')
+    port = TypedProperty('port')
+    buffersize = TypedProperty('buffersize')
 
     @classmethod
     def get_logger_(cls):
