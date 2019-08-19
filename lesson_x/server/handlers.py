@@ -29,7 +29,7 @@ def handle_default_request(raw_request, logger):
         else:
             logger.error(f'Controller {controller} not found!')
             # print(f'Controller {controller} not found!')
-            response = make_response(request, 404, f'Action with name {action} is not supported!')
+            response = make_response(request, 404, f'Action with name {action_name} is not supported!')
 
     else:
         logger.error(f'Wrong request!')

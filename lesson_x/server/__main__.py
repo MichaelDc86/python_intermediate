@@ -1,5 +1,6 @@
 import yaml
 import select
+import threading
 from socket import socket
 from argparse import ArgumentParser
 from handlers import handle_default_request
@@ -13,6 +14,28 @@ try:
 except ModuleNotFoundError:
     sys.path.append(os.getcwd() + '/log')
     from serever_log_config import get_logger
+
+
+def read(sock_, connections_, requests_, buffersize):
+    try:
+        bytes_request = r_client.recv(buffersize)
+    except (ConnectionAbortedError, ConnectionResetError):
+        # except Exception:
+        try:
+            connections_.remove(sock_)
+        except ValueError:
+            pass
+    else:
+        if bytes_request:
+            requests_.append(bytes_request)
+
+
+def write(sock_, connections_, response_):
+    try:
+        sock_.send(response_)
+    except Exception:
+        connections_.remove(sock_)
+
 
 logger = get_logger()
 
@@ -40,19 +63,16 @@ try:
     sock.bind(
         (default_config.get('host'), default_config.get('port'),)
     )
-    sock.setblocking(False)
-    # sock.settimeout(0)  # for windows
+    if sys.platform == 'linux':
+        sock.setblocking(False)  # for nix
+    elif sys.platform == 'win32':
+        sock.settimeout(0)  # for windows
     sock.listen(5)
 
     host = default_config.get('host')
     port = default_config.get('port')
 
     logger.info(f'Server was started on {host}:{port}')
-
-    data = input('Stop server?: y/n ')
-    if data == 'y':
-        sock.close()
-        logger.info('Server shutdown')
 
     connections = []
     requests = []
@@ -65,28 +85,35 @@ try:
         except BlockingIOError:
             pass
 
-        rlist, wlist, xlist = select.select(
-            connections, connections, connections, 0
-        )
+        if connections:
+            # print(connections)
+            rlist, wlist, xlist = select.select(
+                connections, connections, connections, 0
+            )
+            for r_client in rlist:
+                r_thread = threading.Thread(
+                    target=read, args=(
+                        r_client,
+                        connections,
+                        requests,
+                        default_config.get('buffersize')
+                    )
+                )
+                r_thread.start()
 
-        for r_client in rlist:
-            print(rlist)
-            print(wlist)
-            print(xlist)
-            b_request = r_client.recv(default_config.get('buffersize'))
-            requests.append(b_request)
+            if requests:
+                b_request = requests.pop()
+                b_response = handle_default_request(b_request, logger)
 
-        if requests:
-            print(requests)
-            b_request = requests.pop()
-            b_response = handle_default_request(b_request, logger)
+                for w_client in wlist:
+                    w_thread = threading.Thread(
+                        target=write, args=(
+                            w_client,
+                            connections,
+                            b_response,
+                        )
+                    )
+                    w_thread.start()
 
-            for w_client in wlist:
-                w_client.send(b_response)
-
-        # data = input('Stop server?: y/n ')
-        # if data == 'y':
-        #     logger.info('Server shutdown')
-        #     break
 except KeyboardInterrupt:
     logger.info('Server shutdown')
