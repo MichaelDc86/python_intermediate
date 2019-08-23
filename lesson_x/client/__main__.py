@@ -134,6 +134,7 @@ class Client:
         )
 
         read_thread.start()
+
         while True:
             self.write(self.sock)
 

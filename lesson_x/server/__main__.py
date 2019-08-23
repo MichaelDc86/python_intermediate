@@ -4,12 +4,13 @@ import threading
 from socket import socket
 from argparse import ArgumentParser
 from handlers import handle_default_request
+from settings import INSTALLED_MODULES, BASE_DIR
 
 import sys
 import os
 
-from database import engine, metadata
-from echo.models import echo
+from database import Base, engine  # engine, metadata
+from echo.models import Message
 
 try:
     sys.path.append(os.getcwd() + '\\log')
@@ -49,9 +50,16 @@ class TypedProperty:
                 self.default_config.update(config_)
 
         if self.args.migrate:
-            metadata.create_all(engine)
-            echo_migrations = echo
-            print(echo_migrations)
+            module_name_list = [f'{item}.models' for item in INSTALLED_MODULES]
+            module_path_list = [os.path.join(BASE_DIR, item, 'models.py') for item in INSTALLED_MODULES]
+
+            for index, path in enumerate(module_path_list):
+
+                if os.path.exists(path):
+                    __import__(module_name_list[index])
+                Base.metadata.create_all()
+
+            return None
 
         return self.default_config.get(self.name)
 
@@ -155,15 +163,20 @@ class Server:
 try:
 
     server = Server()
-    server.socket_bind()
+    try:
+        print(BASE_DIR)
+        server.socket_bind()
 
-    while True:
-        try:
-            server.accept()
-        except BlockingIOError:
-            pass
+        while True:
+            try:
+                server.accept()
+            except BlockingIOError:
+                pass
 
-        server.read_write()
+            server.read_write()
+
+    except TypeError:
+        pass
 
 except KeyboardInterrupt:
     server.logger.info('Server shutdown')

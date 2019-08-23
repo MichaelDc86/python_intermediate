@@ -1,22 +1,17 @@
-from sqlalchemy import Table, Integer, String, Column, DateTime
-from sqlalchemy.orm import mapper
+from datetime import datetime
+from sqlalchemy import Integer, String, Column, DateTime, ForeignKey
 
-from database import metadata
-
-message_table = Table(
-        'messages', metadata,
-        Column('id', Integer, primary_key=True),
-        Column('content', String),
-        Column('user', String),
-        Column('created', DateTime),
-    )
+from database import Base
+from auth.models import User
+from sqlalchemy.orm import relationship
 
 
-class Message:
-    def __init__(self, content, user, date):
-        self.content = content
-        self.user = user
-        self.date = date
+class Message(Base):
 
+    __tablename__ = 'messages'
 
-echo = mapper(Message, message_table)
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    content = Column(String, nullable=True)
+    created = Column(DateTime, default=datetime.now())
+    user_id = Column(Integer, ForeignKey('users.id'))
+    user = relationship('User', back_populates='messages')
