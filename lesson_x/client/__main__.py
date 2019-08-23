@@ -30,7 +30,7 @@ class TypedProperty:
         'buffersize': 1024
     }
 
-    def update_default_config(self):
+    def __get__(self, instance, cls):
         parser = ArgumentParser()
 
         parser.add_argument(
@@ -42,7 +42,6 @@ class TypedProperty:
                 config_ = yaml.load(file, Loader=yaml.Loader)
                 self.default_config.update(config_)
 
-    def __get__(self, instance, cls):
         return self.default_config.get(self.name)
 
     def __set__(self, instance, value):
@@ -73,6 +72,20 @@ class Client:
         self.logger = ConfigClient().get_logger_()
         self.sock = None
 
+    def __enter__(self):
+        if not self.sock:
+            self.sock = socket()
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        message = 'Client shut down.'
+        if exc_type:
+            if exc_type is not KeyboardInterrupt:
+                message = 'Client stopped with error!'
+        self.logger.info(message)
+        self.sock.close()
+        return True
+
     def socket_bind(self):
         self.sock = socket()
         self.sock.connect(
@@ -82,9 +95,13 @@ class Client:
 
     def read(self, sock_, buffersize_):
         while True:
-            compressed_response = sock_.recv(buffersize_)
-            b_response = zlib.decompress(compressed_response)
-            self.logger.info(f'RESPONSE: {b_response.decode()}')
+            try:
+                compressed_response = sock_.recv(buffersize_)
+                b_response = zlib.decompress(compressed_response)
+                self.logger.info(f'RESPONSE: {b_response.decode()}')
+            except ConnectionAbortedError:
+                client.logger.info(f'Client broke the connection.')
+                break
 
     def write(self, sock_):
         hash_obj = hashlib.sha256()
@@ -115,17 +132,26 @@ class Client:
                 self.buffersize
             )
         )
+
         read_thread.start()
         while True:
             self.write(self.sock)
 
 
-client = Client()
-client.socket_bind()
+"""left this commented lines for myself(another solution)"""
 
-try:
+# client = Client()
+# client.socket_bind()
+#
+# try:
+#     client.read_write()
+#
+# except KeyboardInterrupt:
+#     client.sock.close()
+#     client.logger.info(f'Client shutdown.')
+
+"""solution with context manager(added __enter__ and __exit__ to Client)"""
+
+with Client() as client:
+    client.socket_bind()
     client.read_write()
-
-except KeyboardInterrupt:
-    client.sock.close()
-    client.logger.info(f'Client shutdown.')

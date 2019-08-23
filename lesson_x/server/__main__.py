@@ -8,6 +8,9 @@ from handlers import handle_default_request
 import sys
 import os
 
+from database import engine, metadata
+from echo.models import echo
+
 try:
     sys.path.append(os.getcwd() + '\\log')
     from serever_log_config import get_logger
@@ -28,19 +31,28 @@ class TypedProperty:
         'buffersize': 1024
     }
 
-    def update_default_config(self):
+    def __get__(self, instance, cls):
         parser = ArgumentParser()
 
         parser.add_argument(
             '-c', '--config', type=str, required=False, help='Sets config file path'
         )
+
+        parser.add_argument(
+            '-m', '--migrate', action='store_true'
+        )
+
         self.args = parser.parse_args()
         if self.args.config:
             with open(self.args.config) as file:
                 config_ = yaml.load(file, Loader=yaml.Loader)
                 self.default_config.update(config_)
 
-    def __get__(self, instance, cls):
+        if self.args.migrate:
+            metadata.create_all(engine)
+            echo_migrations = echo
+            print(echo_migrations)
+
         return self.default_config.get(self.name)
 
     def __set__(self, instance, value):

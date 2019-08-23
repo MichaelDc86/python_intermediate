@@ -2,7 +2,15 @@ from fabric.api import local
 
 
 def server():
-    local('python server')
+    local('python server')  # command with config: py server -c config.yaml
+
+
+def server_conf(file):
+    local(f'python server -c {file}')  # command: fab server_conf:file=name_of_file.yaml
+
+
+def migrate():
+    local('python server -m')
 
 
 # def client(mode):
