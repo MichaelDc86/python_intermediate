@@ -11,7 +11,7 @@ from .models import Message
 def echo_controller(request):
     data = request.get('data')
     session = Session()
-    message = Message(content=data, users_id=1)
+    message = Message(content=data, user_id=1)
     session.add(message)
     session.commit()
 
@@ -32,7 +32,8 @@ def update_messages_controller(request):
     session = Session()
     message = get_item(request, session)
 
-    message.content += '/updated/'
+    # message.content += '/updated/'
+    message.content = request['data']
     session.add(message)
     session.commit()
 
@@ -49,7 +50,7 @@ def delete_message_controller(request):
     session.delete(message)
     session.commit()
     messages = get_all_messages()
-    id_deleted = request['data']
+    id_deleted = request['id_req']
     messages.append({'deleted': f'message with id {id_deleted} was deleted!'})
 
     return make_response(request, 200, messages)
@@ -58,7 +59,7 @@ def delete_message_controller(request):
 def get_item(request, session):
 
     try:
-        message = session.query(Message).filter(Message.id == int(request['data'])).first()
+        message = session.query(Message).filter(Message.id == int(request['id_req'])).first()
     except ValueError:
         response = 'Input id of message to update(must be digit)'
         return make_response(request, 400, response)

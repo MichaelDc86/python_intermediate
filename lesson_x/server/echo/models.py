@@ -14,4 +14,4 @@ class Message(Base):
     content = Column(String, nullable=True)
     created = Column(DateTime, default=datetime.now())
     user_id = Column(Integer, ForeignKey('users.id'))
-    user = relationship('User', back_populates='messages')
+    user = relationship(User, back_populates='messages')

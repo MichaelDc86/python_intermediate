@@ -110,9 +110,18 @@ class Client:
         )
 
         action = input('Specify action: ')
-        data = input('Enter data:  ')
+        id_req = None
+        data = None
+        if 'update' in action:
+            id_req = input('Specify id of message to update: ')
+            data = input('Enter data to update message:  ')
+        elif 'delete' in action:
+            id_req = input('Specify id of message to delete: ')
+        else:
+            data = input('Enter data:  ')
 
         request = {
+            'id_req': id_req,
             'data': data,
             'time': datetime.now().timestamp(),
             'action': action,
