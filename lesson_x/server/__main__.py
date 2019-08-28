@@ -12,12 +12,7 @@ import os
 from database import Base, engine  # engine, metadata
 from echo.models import Message
 
-try:
-    sys.path.append(os.getcwd() + '\\log')
-    from serever_log_config import get_logger
-except ModuleNotFoundError:
-    sys.path.append(os.getcwd() + '/log')
-    from serever_log_config import get_logger
+from log.serever_log_config import get_logger
 
 
 class TypedProperty:

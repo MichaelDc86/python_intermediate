@@ -7,15 +7,7 @@ from datetime import datetime
 import hashlib
 import threading
 
-import sys
-import os
-
-try:
-    sys.path.append(os.getcwd() + '\\log')
-    from client_log_config import get_logger
-except ModuleNotFoundError:
-    sys.path.append(os.getcwd() + '/log')
-    from client_log_config import get_logger
+from log.client_log_config import get_logger
 
 
 class TypedProperty:
