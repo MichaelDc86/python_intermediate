@@ -73,7 +73,7 @@ class Client:
         message = 'Client shut down.'
         if exc_type:
             if exc_type is not KeyboardInterrupt:
-                message = 'Client stopped with error!'
+                message = f'Client stopped with error {exc_type} {exc_val}!'
         self.logger.info(message)
         self.sock.close()
         return True

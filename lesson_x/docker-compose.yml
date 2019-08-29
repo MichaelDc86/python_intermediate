@@ -10,7 +10,7 @@ services:
       - 8000
   client:
     build: ./client
-    command: python .
+    command: python . -c config.yaml
     volumes:
       - ./client:/app
     depends_on:
