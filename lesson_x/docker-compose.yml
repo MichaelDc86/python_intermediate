@@ -8,10 +8,17 @@ services:
       - ./server:/app
     ports:
       - 8000
-  client:
-    build: ./client
-    command: python . -c config.yaml
+
+  docs:
+    build: ./docs
+    command: make html
     volumes:
-      - ./client:/app
-    depends_on:
-      - server
+      - ./docs:/app
+
+#  client:
+#    build: ./client
+#    command: python . -c config.yaml
+#    volumes:
+#      - ./client:/app
+#    depends_on:
+#      - server

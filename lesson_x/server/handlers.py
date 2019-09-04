@@ -8,6 +8,7 @@ from middlewares import compression_middleware, encryption_middleware
 @encryption_middleware
 def handle_default_request(raw_request, logger):
     request = json.loads(raw_request.decode())
+    print(f'request: {request}')
 
     if validate_request(request):
         action_name = request.get('action')
