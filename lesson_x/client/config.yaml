@@ -1,0 +1,3 @@
+buffersize: 512
+host: 'server'
+port: 8000

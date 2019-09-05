@@ -7,15 +7,18 @@ from datetime import datetime
 import hashlib
 import threading
 
-import sys
-import os
+from Cryptodome.Cipher import AES
+from Crypto import Random
 
-try:
-    sys.path.append(os.getcwd() + '\\log')
-    from client_log_config import get_logger
-except ModuleNotFoundError:
-    sys.path.append(os.getcwd() + '/log')
-    from client_log_config import get_logger
+from log.client_log_config import get_logger
+
+
+def int_to_bytes(x: int) -> bytes:
+    return x.to_bytes((x.bit_length() + 7) // 8, 'big')
+
+
+def int_from_bytes(xbytes: bytes) -> int:
+    return int.from_bytes(xbytes, 'big')
 
 
 class TypedProperty:
@@ -30,7 +33,7 @@ class TypedProperty:
         'buffersize': 1024
     }
 
-    def update_default_config(self):
+    def __get__(self, instance, cls):
         parser = ArgumentParser()
 
         parser.add_argument(
@@ -42,7 +45,6 @@ class TypedProperty:
                 config_ = yaml.load(file, Loader=yaml.Loader)
                 self.default_config.update(config_)
 
-    def __get__(self, instance, cls):
         return self.default_config.get(self.name)
 
     def __set__(self, instance, value):
@@ -73,6 +75,20 @@ class Client:
         self.logger = ConfigClient().get_logger_()
         self.sock = None
 
+    def __enter__(self):
+        if not self.sock:
+            self.sock = socket()
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        message = 'Client shut down.'
+        if exc_type:
+            if exc_type is not KeyboardInterrupt:
+                message = f'Client stopped with error {exc_type} {exc_val}!'
+        self.logger.info(message)
+        self.sock.close()
+        return True
+
     def socket_bind(self):
         self.sock = socket()
         self.sock.connect(
@@ -82,9 +98,31 @@ class Client:
 
     def read(self, sock_, buffersize_):
         while True:
-            compressed_response = sock_.recv(buffersize_)
-            b_response = zlib.decompress(compressed_response)
-            self.logger.info(f'RESPONSE: {b_response.decode()}')
+            try:
+                compressed_response = sock_.recv(buffersize_)
+                b_response = zlib.decompress(compressed_response)
+                encrypted_request = json.loads(b_response)
+
+                """decryption"""
+                """create cipher"""
+
+                key_raw = encrypted_request.get('key')
+                key = int_to_bytes(key_raw)
+                encode_list = encrypted_request.get('encode_list')
+                encode_list = list(map(lambda x: int_to_bytes(x), encode_list))
+                nonce, tag, ciphertext = [x for x in encode_list]
+
+                cipher = AES.new(key, AES.MODE_EAX, nonce)
+
+                """decryption part"""
+
+                decrypted_data = cipher.decrypt_and_verify(ciphertext, tag)
+                decrypted_response = encrypted_request.copy()
+                decrypted_response['data'] = decrypted_data.decode()
+                self.logger.info(f'RESPONSE: {decrypted_response}')
+            except ConnectionAbortedError:
+                client.logger.info(f'Client broke the connection.')
+                break
 
     def write(self, sock_):
         hash_obj = hashlib.sha256()
@@ -93,10 +131,34 @@ class Client:
         )
 
         action = input('Specify action: ')
-        data = input('Enter data:  ')
+        id_req = None
+        data = None
+        if 'update' in action:
+            id_req = input('Specify id of message to update: ')
+            data = input('Enter data to update message:  ')
+        elif 'delete' in action:
+            id_req = input('Specify id of message to delete: ')
+        else:
+            data = input('Enter data:  ')
+
+        """encryption"""
+        """create cipher"""
+
+        key_bytes = 16
+        key = Random.get_random_bytes(key_bytes)
+        key_int = int_from_bytes(key)
+        cipher = AES.new(key, AES.MODE_EAX)
+
+        """encoding part"""
+        ciphertext, tag = cipher.encrypt_and_digest(data.encode())
+        encode_list = [x for x in (cipher.nonce, tag, ciphertext)]
+        encode_list = list(map(lambda x: int_from_bytes(x), encode_list))
 
         request = {
-            'data': data,
+            'encode_list': encode_list,
+            'key': key_int,
+            'id_req': id_req,
+            # 'data': encrypted_data,
             'time': datetime.now().timestamp(),
             'action': action,
             'token': hash_obj.hexdigest(),
@@ -115,17 +177,27 @@ class Client:
                 self.buffersize
             )
         )
+
         read_thread.start()
+
         while True:
             self.write(self.sock)
 
 
-client = Client()
-client.socket_bind()
+"""left this commented lines for myself(another solution)"""
 
-try:
+# client = Client()
+# client.socket_bind()
+#
+# try:
+#     client.read_write()
+#
+# except KeyboardInterrupt:
+#     client.sock.close()
+#     client.logger.info(f'Client shutdown.')
+
+"""solution with context manager(added __enter__ and __exit__ to Client)"""
+
+with Client() as client:
+    client.socket_bind()
     client.read_write()
-
-except KeyboardInterrupt:
-    client.sock.close()
-    client.logger.info(f'Client shutdown.')
