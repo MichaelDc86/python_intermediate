@@ -14,6 +14,7 @@
     <script type="text/javascript" src="_static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Protocol API examples" href="protocol/index.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -33,13 +34,49 @@
   <div class="section" id="welcome-to-server-s-documentation">
 <h1>Welcome to server’s documentation!<a class="headerlink" href="#welcome-to-server-s-documentation" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
-</div>
-<dl class="simple">
-<dt>Modules</dt><dd><ul class="simple">
-<li><p><a href="#id1"><span class="problematic" id="id2">echo_</span></a></p></li>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="protocol/index.html">Protocol API examples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="protocol/transport.html">Transport functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="protocol/validation.html">Validation functions</a></li>
 </ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="echo/index.html">Echo controller</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="echo/actions.html">Actions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="echo/models.html">Model Message</a></li>
+<li class="toctree-l2"><a class="reference internal" href="echo/controllers.html">Controller functions</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="module-protocol">
+<span id="modules"></span><h1>Modules<a class="headerlink" href="#module-protocol" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="protocol.make_response">
+<code class="sig-prename descclassname">protocol.</code><code class="sig-name descname">make_response</code><span class="sig-paren">(</span><em class="sig-param">request</em>, <em class="sig-param">code</em>, <em class="sig-param">data=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/protocol.html#make_response"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#protocol.make_response" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function for preparing a request
+:param request: client request
+:param code: server-answer code
+:param data: server-answer data
+:return: dictionary request</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="protocol.validate_request">
+<code class="sig-prename descclassname">protocol.</code><code class="sig-name descname">validate_request</code><span class="sig-paren">(</span><em class="sig-param">request</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/protocol.html#validate_request"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#protocol.validate_request" title="Permalink to this definition">¶</a></dt>
+<dd><p>Function to validate simple client request
+:param request: raw client request
+:return: bool value - validation solution</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt>Example::</dt><dd><p>{‘action’: ‘echo’, ‘time’: ‘’}</p>
 </dd>
 </dl>
+</li>
+</ul>
+</dd></dl>
+
 </div>
 <div class="section" id="indices-and-tables">
 <h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
@@ -67,11 +104,17 @@
 
 
 <h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="protocol/index.html">Protocol API examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="echo/index.html">Echo controller</a></li>
+</ul>
 
 <div class="relations">
 <h3>Related Topics</h3>
 <ul>
   <li><a href="#">Documentation overview</a><ul>
+      <li>Next: <a href="protocol/index.html" title="next chapter">Protocol API examples</a></li>
   </ul></li>
 </ul>
 </div>

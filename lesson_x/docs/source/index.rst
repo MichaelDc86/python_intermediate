@@ -10,9 +10,13 @@ Welcome to server's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+   protocol/index
+   echo/index
+
 Modules
-   echo
-.. automodule:: echo
+==================================
+
+.. automodule:: protocol
    :members:
 
 Indices and tables
