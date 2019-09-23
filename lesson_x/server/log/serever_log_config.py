@@ -10,7 +10,7 @@ def create_logger():
 
     # handler = logging.FileHandler('log/server.log')
     # handler = logging.handlers.TimedRotatingFileHandler('log/server.log', when='s', interval=1, backupCount=3)
-    handler = logging.handlers.TimedRotatingFileHandler('log/server.log', when='D', interval=1, backupCount=7)
+    handler = logging.handlers.TimedRotatingFileHandler('server/log/server.log', when='D', interval=1, backupCount=7)
     handler_console = logging.StreamHandler()
     handler.setFormatter(formatter)
     handler.setLevel(logging.DEBUG)

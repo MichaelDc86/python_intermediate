@@ -11,6 +11,9 @@ import threading
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QDesktopWidget, QTextEdit,
                              QPushButton, QVBoxLayout, QHBoxLayout, QLineEdit, QWidget)
 
+from PyQt5.QtWidgets import QAction
+from PyQt5.QtGui import QIcon, QFont
+
 from Cryptodome.Cipher import AES
 from Crypto import Random
 
@@ -244,6 +247,66 @@ class Client:
 
         central_widget.setLayout(base_layout)
         window.setCentralWidget(central_widget)
+
+        """actions with text"""
+
+        def actionBold():
+            myFont = QFont()
+            myFont.setBold(True)
+            self.enter_text.setFont(myFont)
+
+        def actionItalic():
+            myFont = QFont()
+            myFont.setItalic(True)
+            self.enter_text.setFont(myFont)
+
+        def actionUnderlined():
+            myFont = QFont()
+            myFont.setUnderline(True)
+            self.enter_text.setFont(myFont)
+
+        our_bold = QAction(QIcon('pyqt_examples/b.jpg'), 'Bold', window)
+        our_bold.triggered.connect(actionBold)
+
+        our_italic = QAction(QIcon('pyqt_examples/i.jpg'), 'Italic', window)
+        our_italic.triggered.connect(actionItalic)
+
+        our_underlined = QAction(QIcon('pyqt_examples/u.jpg'), 'Underlined', window)
+        our_underlined.triggered.connect(actionUnderlined)
+
+        # smiles
+
+        def actionSmile():
+            url = 'pyqt_examples/1lesson_source/Smile/ab.gif'
+            self.enter_text.setHtml('<img src="%s" />' % url)
+
+        def actionMelancholy():
+            url = 'pyqt_examples/1lesson_source/Smile/ac.gif'
+            self.enter_text.setHtml('<img src="%s" />' % url)
+
+        def actionSurprise():
+            url = 'pyqt_examples/1lesson_source/Smile/ai.gif'
+            self.enter_text.setHtml('<img src="%s" />' % url)
+
+        smile = QAction(QIcon('pyqt_examples/1lesson_source/Smile/ab.gif'), 'Smile', window)
+        smile.triggered.connect(actionSmile)
+
+        melancholy = QAction(QIcon('pyqt_examples/1lesson_source/Smile/ac.gif'), 'Melancholy', window)
+        melancholy.triggered.connect(actionMelancholy)
+
+        surprise = QAction(QIcon('pyqt_examples/1lesson_source/Smile/ai.gif'), 'Surprise', window)
+        surprise.triggered.connect(actionSurprise)
+
+        # ------------------------------------------------
+
+        tool_b = window.addToolBar('Formatting')
+        tool_b.addAction(our_bold)
+        tool_b.addAction(our_italic)
+        tool_b.addAction(our_underlined)
+        tool_b.addAction(smile)
+        tool_b.addAction(melancholy)
+        tool_b.addAction(surprise)
+
 
         dsk_widget = QDesktopWidget()
         geometry = dsk_widget.availableGeometry()
