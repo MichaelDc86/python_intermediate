@@ -1,3 +1,4 @@
+"""Models for echo-controller"""
 from datetime import datetime
 from sqlalchemy import Integer, String, Column, DateTime, ForeignKey
 
@@ -7,6 +8,11 @@ from sqlalchemy.orm import relationship
 
 
 class Message(Base):
+    """
+    Base model for users messages
+    id - primary key, autoincrement
+    relations with User from auth app
+    """
 
     __tablename__ = 'messages'
 

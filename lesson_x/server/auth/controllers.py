@@ -1,4 +1,5 @@
 import hmac
+import json
 from datetime import datetime
 
 from database import session_scope
@@ -8,6 +9,15 @@ from .decorators import login_required
 from .utils import authenticate, login
 from .settings import SECRET_KEY
 from .models import User, Session
+
+
+def get_login_pass_from_data(request):
+    data = json.loads(request.get('data'))
+    log_in = data.get('login')
+    pass_d = data.get('password')
+
+    request.update({'login': log_in, 'password': pass_d})
+    return request
 
 
 def login_controller(request):
@@ -39,6 +49,8 @@ def login_controller(request):
 def registration_controller(request):
     errors = {}
     is_valid = True
+    request = get_login_pass_from_data(request)
+    print(f'request-updated: {request}')
 
     if not 'password' in request:
         errors.update({'password': 'Attribute is required'})
@@ -50,14 +62,16 @@ def registration_controller(request):
     if not is_valid:
         return make_response(request, 400, {'errors': errors})
 
-    hmac_obj = hmac.new(SECRET_KEY, request.get('password'))
+    hmac_obj = hmac.new(SECRET_KEY, request.get('password').encode())
     password_digest = hmac_obj.digest()
 
     with session_scope() as db_session:
         user = User(name=request.get('login'), password=password_digest)
         db_session.add(user)
-        token = login(request, user)
-        return make_response(request, 200, {'token': token})
+
+    token = login(request, user)
+
+    return make_response(request, 200, {'token': token})
 
 
 @login_required

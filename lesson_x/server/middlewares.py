@@ -58,7 +58,7 @@ def encryption_middleware(func):
         """encryption part"""
 
         decrypted_response = json.loads(b_response)
-        decrypted_data = decrypted_response.get('data')
+        decrypted_data = json.dumps(decrypted_response.get('data'))
 
         ciphertext, tag = cipher_send.encrypt_and_digest(decrypted_data.encode())
         encrypted_response = decrypted_response.copy()

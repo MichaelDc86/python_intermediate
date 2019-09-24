@@ -1,3 +1,6 @@
+"""
+List of all actions with appropriate controllers for echo module
+"""
 from .controllers import (
     echo_controller,
     get_messages_controller,

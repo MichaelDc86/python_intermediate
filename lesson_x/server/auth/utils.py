@@ -19,9 +19,10 @@ def authenticate(login, password):
 def login(request, user):
     with session_scope() as db_session:
         hash_obj = hashlib.sha256()
-        hash_obj.update(SECRET_KEY.encode())
-        hash_obj.update(str(request.get('time').encode()))
+        hash_obj.update(SECRET_KEY)
+        hash_obj.update(str(request.get('time')).encode())
         token = hash_obj.hexdigest()
         user_session = Session(user=user, token=token)
         db_session.add(user_session)
+
         return token
