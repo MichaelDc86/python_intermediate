@@ -7,7 +7,7 @@ def create_logger():
 
     formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(module)s - %(message)s')
 
-    handler = logging.FileHandler('log/client.log')
+    handler = logging.FileHandler('client/log/client.log')
     handler.setFormatter(formatter)
     handler.setLevel(logging.DEBUG)
     handler_console = logging.StreamHandler()

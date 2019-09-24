@@ -9,7 +9,7 @@ from settings import INSTALLED_MODULES, BASE_DIR
 import sys
 import os
 
-from database import Base, engine  # engine, metadata
+from database import Base, engine  # engine, metadata,
 from echo.models import Message
 
 from log.serever_log_config import get_logger

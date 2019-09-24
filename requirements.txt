@@ -8,3 +8,4 @@ tabulate
 sqlalchemy
 pycryptodome
 pycryptodomex
+PyQt5
