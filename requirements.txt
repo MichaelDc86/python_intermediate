@@ -6,3 +6,5 @@ fabric3
 pyyaml
 tabulate
 sqlalchemy
+pycryptodome
+pycryptodomex

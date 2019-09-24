@@ -7,7 +7,18 @@ from datetime import datetime
 import hashlib
 import threading
 
+from Cryptodome.Cipher import AES
+from Crypto import Random
+
 from log.client_log_config import get_logger
+
+
+def int_to_bytes(x: int) -> bytes:
+    return x.to_bytes((x.bit_length() + 7) // 8, 'big')
+
+
+def int_from_bytes(xbytes: bytes) -> int:
+    return int.from_bytes(xbytes, 'big')
 
 
 class TypedProperty:
@@ -90,7 +101,25 @@ class Client:
             try:
                 compressed_response = sock_.recv(buffersize_)
                 b_response = zlib.decompress(compressed_response)
-                self.logger.info(f'RESPONSE: {b_response.decode()}')
+                encrypted_request = json.loads(b_response)
+
+                """decryption"""
+                """create cipher"""
+
+                key_raw = encrypted_request.get('key')
+                key = int_to_bytes(key_raw)
+                encode_list = encrypted_request.get('encode_list')
+                encode_list = list(map(lambda x: int_to_bytes(x), encode_list))
+                nonce, tag, ciphertext = [x for x in encode_list]
+
+                cipher = AES.new(key, AES.MODE_EAX, nonce)
+
+                """decryption part"""
+
+                decrypted_data = cipher.decrypt_and_verify(ciphertext, tag)
+                decrypted_response = encrypted_request.copy()
+                decrypted_response['data'] = decrypted_data.decode()
+                self.logger.info(f'RESPONSE: {decrypted_response}')
             except ConnectionAbortedError:
                 client.logger.info(f'Client broke the connection.')
                 break
@@ -112,9 +141,24 @@ class Client:
         else:
             data = input('Enter data:  ')
 
+        """encryption"""
+        """create cipher"""
+
+        key_bytes = 16
+        key = Random.get_random_bytes(key_bytes)
+        key_int = int_from_bytes(key)
+        cipher = AES.new(key, AES.MODE_EAX)
+
+        """encoding part"""
+        ciphertext, tag = cipher.encrypt_and_digest(data.encode())
+        encode_list = [x for x in (cipher.nonce, tag, ciphertext)]
+        encode_list = list(map(lambda x: int_from_bytes(x), encode_list))
+
         request = {
+            'encode_list': encode_list,
+            'key': key_int,
             'id_req': id_req,
-            'data': data,
+            # 'data': encrypted_data,
             'time': datetime.now().timestamp(),
             'action': action,
             'token': hash_obj.hexdigest(),
