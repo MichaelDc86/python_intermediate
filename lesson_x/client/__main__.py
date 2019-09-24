@@ -7,15 +7,7 @@ from datetime import datetime
 import hashlib
 import threading
 
-import sys
-import os
-
-try:
-    sys.path.append(os.getcwd() + '\\log')
-    from client_log_config import get_logger
-except ModuleNotFoundError:
-    sys.path.append(os.getcwd() + '/log')
-    from client_log_config import get_logger
+from log.client_log_config import get_logger
 
 
 class TypedProperty:
@@ -81,7 +73,7 @@ class Client:
         message = 'Client shut down.'
         if exc_type:
             if exc_type is not KeyboardInterrupt:
-                message = 'Client stopped with error!'
+                message = f'Client stopped with error {exc_type} {exc_val}!'
         self.logger.info(message)
         self.sock.close()
         return True
