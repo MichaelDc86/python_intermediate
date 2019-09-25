@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import random
-from PIL import Image, ImageDraw #Подключим необходимые библиотеки.
+from PIL import Image, ImageDraw  # Подключим необходимые библиотеки.
 from PIL.ImageQt import ImageQt
 
 import sys

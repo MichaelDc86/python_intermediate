@@ -2,8 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import sys
-from PyQt5.QtWidgets import (QMainWindow, QTextEdit, QLabel,
-    QAction, QFileDialog, QApplication)
+from PyQt5.QtWidgets import (QMainWindow, QTextEdit, QLabel, QAction, QFileDialog, QApplication)
 from PyQt5.QtGui import QPixmap, QIcon
 
 
@@ -13,7 +12,6 @@ class Example(QMainWindow):
         super().__init__()
 
         self.initUI()
-
 
     def initUI(self):
 

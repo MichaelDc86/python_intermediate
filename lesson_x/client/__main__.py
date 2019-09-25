@@ -236,10 +236,10 @@ class Client:
         self.send_button.setMaximumHeight(64)
 
         base_layout = QVBoxLayout()
-
         top_layout = QHBoxLayout()
         footer_layout = QHBoxLayout()
         top_layout.addWidget(self.display_text)
+
         footer_layout.addWidget(self.enter_text)
         footer_layout.addWidget(self.send_button)
         base_layout.addLayout(top_layout)
@@ -250,19 +250,34 @@ class Client:
 
         """actions with text"""
 
+        self.unformat_count = 0
+
+        def check_unformat_count():
+            self.unformat_count += 1
+            if self.unformat_count > 1:
+                self.unformat_count = 0
+                return True
+            return False
+
         def actionBold():
             myFont = QFont()
             myFont.setBold(True)
+            if check_unformat_count():
+                myFont.setBold(False)
             self.enter_text.setFont(myFont)
 
         def actionItalic():
             myFont = QFont()
             myFont.setItalic(True)
+            if check_unformat_count():
+                myFont.setItalic(False)
             self.enter_text.setFont(myFont)
 
         def actionUnderlined():
             myFont = QFont()
             myFont.setUnderline(True)
+            if check_unformat_count():
+                myFont.setUnderline(False)
             self.enter_text.setFont(myFont)
 
         our_bold = QAction(QIcon('pyqt_examples/b.jpg'), 'Bold', window)
@@ -299,6 +314,8 @@ class Client:
 
         # ------------------------------------------------
 
+        """toolbar"""
+
         tool_b = window.addToolBar('Formatting')
         tool_b.addAction(our_bold)
         tool_b.addAction(our_italic)
@@ -307,6 +324,7 @@ class Client:
         tool_b.addAction(melancholy)
         tool_b.addAction(surprise)
 
+        # -------------------------------------------------
 
         dsk_widget = QDesktopWidget()
         geometry = dsk_widget.availableGeometry()
