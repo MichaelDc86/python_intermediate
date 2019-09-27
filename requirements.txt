@@ -10,3 +10,4 @@ pycryptodome
 pycryptodomex
 PyQt5
 Pillow
+sqlalchemy_imageattach
